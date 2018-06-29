@@ -44,7 +44,8 @@ from pycocotools.cocoeval import COCOeval
 from pycocotools import mask as maskUtils
 
 import zipfile
-import urllib.request
+# import urllib.request
+from urllib2 import urlopen
 import shutil
 
 # Root directory of the project
@@ -174,7 +175,7 @@ class CocoDataset(utils.Dataset):
         if not os.path.exists(imgDir):
             os.makedirs(imgDir)
             print("Downloading images to " + imgZipFile + " ...")
-            with urllib.request.urlopen(imgURL) as resp, open(imgZipFile, 'wb') as out:
+            with urlopen(imgURL) as resp, open(imgZipFile, 'wb') as out:
                 shutil.copyfileobj(resp, out)
             print("... done downloading.")
             print("Unzipping " + imgZipFile)
