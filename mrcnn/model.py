@@ -2469,8 +2469,7 @@ class MaskRCNN():
         masks: [H, W, N] instance binary masks
         """
         assert self.mode == "inference", "Create model in inference mode."
-        assert len(
-            images) == self.config.BATCH_SIZE, "len(images) must be equal to BATCH_SIZE"
+        assert len(images) == self.config.BATCH_SIZE, "len(images) must be equal to BATCH_SIZE"
 
         if verbose:
             log("Processing {} images".format(len(images)))
@@ -2491,6 +2490,8 @@ class MaskRCNN():
         anchors = self.get_anchors(image_shape)
         # Duplicate across the batch dimension because Keras requires it
         # TODO: can this be optimized to avoid duplicating the anchors?
+        # BATCH_SIZE:1, anchors.shape:(261888 , 4)
+        # (self.config.BATCH_SIZE,) + anchors.shape = (1 , 261888 , 4)
         anchors = np.broadcast_to(anchors, (self.config.BATCH_SIZE,) + anchors.shape)
 
         if verbose:
