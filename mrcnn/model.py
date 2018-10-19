@@ -36,6 +36,10 @@ assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
 #  Utility Functions
 ############################################################
 
+def fullmatch(regex, string, flags=0):
+    """Emulate python-3.4 re.fullmatch()."""
+    return re.match("(?:" + regex + r")\Z", string, flags=flags)
+
 def log(text, array=None):
     """Prints a text message. And, optionally, if a Numpy array is provided it
     prints it's shape, min, and max values.
@@ -1268,7 +1272,10 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
     # Note that some boxes might be all zeros if the corresponding mask got cropped out.
     # and here is to filter them out
     _idx = np.sum(mask, axis=(0, 1)) > 0
+    print('_idx:' , _idx)
     mask = mask[:, :, _idx]
+    print('---------------------------------')
+    print('class_ids:' , class_ids)
     class_ids = class_ids[_idx]
     # Bounding boxes. Note that some boxes might be all zeros
     # if the corresponding mask got cropped out.
@@ -1676,6 +1683,9 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
     """
     b = 0  # batch item index
     image_index = -1
+    
+    print('------------------')
+    print(dataset.image_ids)
     image_ids = np.copy(dataset.image_ids)
     error_count = 0
 
@@ -2071,7 +2081,7 @@ class MaskRCNN():
         dir_names = sorted(dir_names)
         if not dir_names:
             import errno
-            raise FileNotFoundError(
+            raise IOError(
                 errno.ENOENT,
                 "Could not find model directory under {}".format(self.model_dir))
         # Pick last directory
@@ -2082,7 +2092,7 @@ class MaskRCNN():
         checkpoints = sorted(checkpoints)
         if not checkpoints:
             import errno
-            raise FileNotFoundError(
+            raise IOError(
                 errno.ENOENT, "Could not find weight files in {}".format(dir_name))
         checkpoint = os.path.join(dir_name, checkpoints[-1])
         return checkpoint
@@ -2213,7 +2223,7 @@ class MaskRCNN():
             if not layer.weights:
                 continue
             # Is it trainable?
-            trainable = bool(re.fullmatch(layer_regex, layer.name))
+            trainable = bool(fullmatch(layer_regex, layer.name))
             # Update layer. If layer is a container, update inner layer.
             if layer.__class__.__name__ == 'TimeDistributed':
                 layer.layer.trainable = trainable
@@ -2264,6 +2274,9 @@ class MaskRCNN():
             self.config.NAME.lower()))
         self.checkpoint_path = self.checkpoint_path.replace(
             "*epoch*", "{epoch:04d}")
+        
+        print('---------------')
+        print('checkpoint_path:' , self.checkpoint_path)
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
               augmentation=None):

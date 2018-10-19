@@ -432,7 +432,7 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     # Default window (y1, x1, y2, x2) and default scale == 1.
     h, w = image.shape[:2]
     window = (0, 0, h, w)
-    scale = 1
+    scale = 1.0
     padding = [(0, 0), (0, 0), (0, 0)]
     crop = None
 
@@ -442,7 +442,7 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     # Scale?
     if min_dim:
         # Scale up but not down
-        scale = max(1, min_dim / min(h, w))
+        scale = max(1, float(min_dim) / float(min(h, w)))
     if min_scale and scale < min_scale:
         scale = min_scale
 
@@ -450,7 +450,7 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     if max_dim and mode == "square":
         image_max = max(h, w)
         if round(image_max * scale) > max_dim:
-            scale = max_dim / image_max
+            scale = float(max_dim) / float(image_max)
 
     # Resize image using bilinear interpolation
     if scale != 1:
