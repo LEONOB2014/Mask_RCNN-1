@@ -46,7 +46,7 @@ class ShapesConfig(Config):
     IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 1  # background + 3 shapes
+    NUM_CLASSES = 1 + 99  # background + 3 shapes
 
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
@@ -81,18 +81,21 @@ model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
 # Load weights trained on MS-COCO
 # model.load_weights(COCO_MODEL_PATH, by_name=True)
 # model_path = model.find_last()[1]
-model_path = "/home/han/Mask_RCNN/samples/shapes/logs/shapes20181017T2026/mask_rcnn_shapes_0030.h5"
+model_path = "/home/han/Mask_RCNN/samples/shapes/logs/shapes20181019T2327/mask_rcnn_shapes_0030.h5"
 # Load trained weights (fill in path to trained weights here)
 assert model_path != "", "Provide path to trained weights"
 print("Loading weights from ", model_path)
 model.load_weights(model_path, by_name=True)
 
-class_names = ['BG', '5']
+# class_names = ['BG', '5']
+
+class_names = ['BG' , '5', '6', '9', '10', '11', '16', '20', '22', '24', '26', '30', '33', '35', '37', '39', '40', '41', '42', '44', '46', '61', '63', '64', '65', '66', '67', '72', '73', '74', '75', '77', '78', '82', '83', '84', '85', '86', '88', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99', '104', '105', '106', '112', '113', '114', '115', '116', '117', '118', '119', '120', '121', '122', '123', '124', '125', '126', '127', '128', '129', '130', '131', '132', '133', '134', '135', '136', '137', '138', '139', '140', '141', '142', '143', '144', '145', '146', '147', '148', '149', '150', '151', '152', '153', '154', '155', '156', '157', '158', '159']
+
 
 # Load a random image from the images folder
 # file_names = next(os.walk(IMAGE_DIR))[2]
 # image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
-file_name = "/media/han/DATA/generate_data/sku/all_sku/5-13.png"
+file_name = "/media/han/DATA/generate_data/sku/all_sku/5-15.png"
 image = skimage.io.imread(file_name)
 
 # Run detection

@@ -35,8 +35,8 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 if not os.path.exists(COCO_MODEL_PATH):
     utils.download_trained_weights(COCO_MODEL_PATH)
 
-CLASSES = ['5', '6', '9', '10', '11', '16', '20', '22', '24', '26', '30', '33', '35', '37', '39', '40', '41', '42', '44', '46', '61', '63', '64', '65', '66', '67', '72', '73', '74', '75', '77', '78', '82', '83', '84', '85', '86', '88', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99', '104', '105', '106', '112', '113', '114', '115', '116', '117', '118', '119', '120', '121', '122', '123', '124', '125', '126', '127', '128', '129', '130', '131', '132', '133', '134', '135', '136', '137', '138', '139', '140', '141', '142', '143', '144', '145', '146', '147', '148', '149', '150', '151', '152', '153', '154', '155', '156', '157', '158', '159']
-# CLASSES = ['5' , '119']
+# CLASSES = ['5', '6', '9', '10', '11', '16', '20', '22', '24', '26', '30', '33', '35', '37', '39', '40', '41', '42', '44', '46', '61', '63', '64', '65', '66', '67', '72', '73', '74', '75', '77', '78', '82', '83', '84', '85', '86', '88', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99', '104', '105', '106', '112', '113', '114', '115', '116', '117', '118', '119', '120', '121', '122', '123', '124', '125', '126', '127', '128', '129', '130', '131', '132', '133', '134', '135', '136', '137', '138', '139', '140', '141', '142', '143', '144', '145', '146', '147', '148', '149', '150', '151', '152', '153', '154', '155', '156', '157', '158', '159']
+CLASSES = ['5' , '119']
 
 class ShapesConfig(Config):
     """Configuration for training on the toy shapes dataset.
@@ -52,12 +52,12 @@ class ShapesConfig(Config):
     IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 99  # background + 3 shapes
+    NUM_CLASSES = 1 + 2  # background + 3 shapes
 
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
-    IMAGE_MIN_DIM = 480
-    IMAGE_MAX_DIM = 1280
+    IMAGE_MIN_DIM = 800
+    IMAGE_MAX_DIM = 800
 
     # Use smaller anchors because our image and objects are small
     RPN_ANCHOR_SCALES = (8 * 6, 16 * 6, 32 * 6, 64 * 6, 128 * 6)  # anchor side in pixels
@@ -178,7 +178,7 @@ def get_ax(rows=1, cols=1, size=8):
     return ax
 
 #基础设置
-dataset_root_path="/home/han/Mask_RCNN/Train/"
+dataset_root_path="/home/han/Mask_RCNN/Train2/"
 img_floder = dataset_root_path + "pic"
 mask_floder = dataset_root_path + "cv2_mask"
 #yaml_floder = dataset_root_path
