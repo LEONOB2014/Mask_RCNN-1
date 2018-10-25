@@ -19,6 +19,13 @@ from mrcnn import visualize
 import yaml
 import cv2
 import glob
+from skimage.measure import find_contours
+import json
+from label_file import LabelFile , LabelFileError
+
+def write_json(json_info , json_name):
+    with open(json_name , 'w') as fp:
+        json.dump(json_info , fp , indent=4)
 
 
 # Root directory of the project
@@ -35,7 +42,9 @@ if not os.path.exists(COCO_MODEL_PATH):
 
 # Directory of images to run detection on
 IMAGE_DIR = os.path.join(ROOT_DIR, "images")
-class_names = ['BG', '119']
+class_names = ['BG', '122' , '126' , '104']
+
+# class_names = ['BG' , '5', '6', '9', '10', '11', '16', '20', '22', '24', '26', '30', '33', '35', '37', '39', '40', '41', '42', '44', '46', '61', '63', '64', '65', '66', '67', '72', '73', '74', '75', '77', '78', '82', '83', '84', '85', '86', '88', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99', '104', '105', '106', '112', '113', '114', '115', '116', '117', '118', '119', '120', '121', '122', '123', '124', '125', '126', '127', '128', '129', '130', '131', '132', '133', '134', '135', '136', '137', '138', '139', '140', '141', '142', '143', '144', '145', '146', '147', '148', '149', '150', '151', '152', '153', '154', '155', '156', '157', '158', '159']
 
 class ShapesConfig(Config):
     """Configuration for training on the toy shapes dataset.
@@ -86,7 +95,7 @@ model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
 # Load weights trained on MS-COCO
 # model.load_weights(COCO_MODEL_PATH, by_name=True)
 # model_path = model.find_last()[1]
-model_path = "/home/han/Mask_RCNN/samples/shapes/logs/shapes20181023T1743/mask_rcnn_shapes_0030.h5"
+model_path = "/home/han/Mask_RCNN/samples/shapes/logs/104-122-126/mask_rcnn_shapes_0100.h5"
 # Load trained weights (fill in path to trained weights here)
 assert model_path != "", "Provide path to trained weights"
 print("Loading weights from ", model_path)
@@ -110,67 +119,137 @@ def predict(img_name , model):
 	masks = results[0]['masks']
 	# class_ids: [num_instances]
 	class_ids = results[0]['class_ids']
+	scores = results[0]['scores']
+	print('scores:' , scores)
 
 	N = boxes.shape[0]
 	print('N:' , N)
 	if not N:
 		print("No object")
-	else:
-		assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
-		
-	if N != 1:
-		print('该张图片检测出多个物体')
 		return None , None , None
 	else:
-		label_img = np.zeros(masks.shape, dtype=np.uint8)
-		label_img[np.where(masks == 1)] = 255
-		label = class_names[class_ids[0]]
-		
-		colors = visualize.random_colors(N , bright=True)
-		
-		mask_image = visualize.apply_mask(image , masks[:,:,0] , colors[0])
-		
-		
-		
-		return label_img , label , mask_image
+		assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
+	
+	score_index = np.argmax(scores)
+	print('score_index:' , score_index)
+	
+	# if N != 1:
+	# 	print('该张图片检测出多个物体')
+	# 	return None , None , None
+	# else:
+	# 	lf = LabelFile()
+	#
+	# 	label_img = np.zeros(masks.shape, dtype=np.uint8)
+	# 	label_img[np.where(masks == 1)] = 255
+	# 	label = class_names[class_ids[0]]
+	#
+	# 	colors = visualize.random_colors(N , bright=True)
+	#
+	# 	mask_image = visualize.apply_mask(image , masks[:,:,0] , colors[0])
+	#
+	# 	# Mask Polygon
+	# 	padded_mask = np.zeros((masks[:,:,0].shape[0] + 2 , masks[:,:,0].shape[1] + 2) , dtype=np.uint8)
+	# 	padded_mask[1:-1 , 1:-1] = masks[:,:,0]
+	# 	contours = find_contours(padded_mask , 0.5)
+	#
+	# 	json_info = {}
+	#
+	# 	json_info["shapes"] = []
+	# 	shape_info = {}
+	# 	shape_info["line_color"] = None
+	# 	shape_info["fill_color"] = None
+	# 	shape_info["label"] = "141"
+	# 	shape_info["points"] = []
+	#
+	# 	for verts in contours:
+	# 		verts = np.fliplr(verts) - 1
+	#
+	# 		for index , vt in enumerate(verts.tolist()):
+	# 			if index % 15 == 0:
+	# 				shape_info["points"].append(vt)
+	# 	json_info["shapes"].append(shape_info)
+	#
+	# 	print('json file:' , img_name.replace("png" , "json"))
+	# 	# write_json(json_info , img_name.replace("png" , "json"))
+	#
+	# 	lf.save(img_name.replace("png" , "json") , shapes=json_info["shapes"] , imagePath=img_name , fillColor=[255, 0, 0, 128] , lineColor=[0 , 255 , 0 , 128] , flags={})
+	#
+	#
+	# 	return label_img , label , mask_image
+	
+	
+	lf = LabelFile()
+
+	label_img = np.zeros(masks[:,:,score_index].shape, dtype=np.uint8)
+	label_img[np.where(masks[:,:,score_index] == 1)] = 255
+	label = class_names[class_ids[score_index]]
+
+	colors = visualize.random_colors(N , bright=True)
+
+	mask_image = visualize.apply_mask(image , masks[:,:,0] , colors[0])
+
+	# Mask Polygon
+	padded_mask = np.zeros((masks[:,:,score_index].shape[0] + 2 , masks[:,:,score_index].shape[1] + 2) , dtype=np.uint8)
+	padded_mask[1:-1 , 1:-1] = masks[:,:,score_index]
+	contours = find_contours(padded_mask , 0.5)
+	json_info = {}
+
+	json_info["shapes"] = []
+	shape_info = {}
+	shape_info["line_color"] = None
+	shape_info["fill_color"] = None
+	shape_info["label"] = label
+	shape_info["points"] = []
+	for verts in contours:
+		verts = np.fliplr(verts) - 1
+		for index , vt in enumerate(verts.tolist()):
+			if index % 15 == 0:
+				shape_info["points"].append(vt)
+	json_info["shapes"].append(shape_info)
+	print('json file:' , img_name.replace("png" , "json"))
+	# write_json(json_info , img_name.replace("png" , "json"))
+	lf.save(img_name.replace("png" , "json") , shapes=json_info["shapes"] , imagePath=os.path.basename(img_name) , fillColor=[255, 0, 0, 128] , lineColor=[0 , 255 , 0 , 128] , flags={})
+	
+	return label_img , label , mask_image
 	
 
 
-# image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
-file_name = "/home/han/Desktop/hhahah/5-71fc4fc6-d665-11e8-9536-cc3d82bf7b29-2.png"
-image = skimage.io.imread(file_name)
-print('shape of image:' , np.shape(image))
-
-# Run detection
-results = model.detect([image], verbose=1)
-print('results:' , results)
-
-mask = results[0]['masks']
-print('shape of mask:' , np.shape(mask))
-
-label_img = np.zeros(mask.shape , dtype=np.uint8)
-label_img[np.where(mask == 1)] = 255
-
-# cv2.imshow("label_img" , label_img)
-# cv2.waitKey(0)
+## image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
+#file_name = "/home/han/Desktop/hhahah/5-71fc4fc6-d665-11e8-9536-cc3d82bf7b29-2.png"
+#image = skimage.io.imread(file_name)
+#print('shape of image:' , np.shape(image))
 #
-r = results[0]
-visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
-                             class_names, r['scores'])
+# # Run detection
+#results = model.detect([image], verbose=1)
+#print('results:' , results)
+#
+#mask = results[0]['masks']
+#print('shape of mask:' , np.shape(mask))
+#
+#label_img = np.zeros(mask.shape , dtype=np.uint8)
+#label_img[np.where(mask == 1)] = 255
+#
+##cv2.imshow("label_img" , label_img)
+##cv2.waitKey(0)
+#
+#r = results[0]
+#visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
+#                              class_names, r['scores'])
 
-# if __name__ == '__main__':
-# 	data_dir = "/home/han/Desktop/hhahah"
-# 	img_lsts = glob.glob(os.path.join(data_dir , "*.png"))
-#
-# 	for i in img_lsts:
-# 		print(i)
-# 		label_img , label , mask_image = predict(i , model)
-# 		if type(label_img) == type(None):
-# 			continue
-#
-# 		cv2.imshow(str(label), label_img)
-# 		cv2.imshow("mask_image" , mask_image)
-# 		cv2.waitKey(1000)
+if __name__ == '__main__':
+	data_dir = "/home/han/Desktop/Data-10-24/126"
+	img_lsts = glob.glob(os.path.join(data_dir , "*.png"))
+	
+
+	for i in img_lsts:
+		print(i)
+		label_img , label , mask_image = predict(i , model)
+		if type(label_img) == type(None):
+			continue
+
+		cv2.imshow(str(label), label_img)
+		cv2.imshow("mask_image" , mask_image)
+		cv2.waitKey(1000)
 
 	
 

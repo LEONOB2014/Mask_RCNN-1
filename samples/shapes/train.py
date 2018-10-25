@@ -36,7 +36,8 @@ if not os.path.exists(COCO_MODEL_PATH):
     utils.download_trained_weights(COCO_MODEL_PATH)
 
 # CLASSES = ['5', '6', '9', '10', '11', '16', '20', '22', '24', '26', '30', '33', '35', '37', '39', '40', '41', '42', '44', '46', '61', '63', '64', '65', '66', '67', '72', '73', '74', '75', '77', '78', '82', '83', '84', '85', '86', '88', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99', '104', '105', '106', '112', '113', '114', '115', '116', '117', '118', '119', '120', '121', '122', '123', '124', '125', '126', '127', '128', '129', '130', '131', '132', '133', '134', '135', '136', '137', '138', '139', '140', '141', '142', '143', '144', '145', '146', '147', '148', '149', '150', '151', '152', '153', '154', '155', '156', '157', '158', '159']
-CLASSES = ['119']
+# CLASSES = ['122' , '126' , '104']
+CLASSES = ['5' , '127' , '147']
 
 class ShapesConfig(Config):
     """Configuration for training on the toy shapes dataset.
@@ -67,7 +68,7 @@ class ShapesConfig(Config):
     TRAIN_ROIS_PER_IMAGE = 4
 
     # Use a small epoch since the data is simple
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 200
 
     # use small validation steps since the epoch is small
     VALIDATION_STEPS = 5
@@ -231,7 +232,7 @@ elif init_with == "last":
 # which layers to train by name pattern.
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=10,
+            epochs=30,
             layers='heads')
 
 
@@ -242,6 +243,6 @@ model.train(dataset_train, dataset_val,
 # train by name pattern.
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=30,
+            epochs=100,
             layers="all")
 
