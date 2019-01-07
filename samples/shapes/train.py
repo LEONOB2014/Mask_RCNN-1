@@ -37,7 +37,7 @@ if not os.path.exists(COCO_MODEL_PATH):
 
 # CLASSES = ['5', '6', '9', '10', '11', '16', '20', '22', '24', '26', '30', '33', '35', '37', '39', '40', '41', '42', '44', '46', '61', '63', '64', '65', '66', '67', '72', '73', '74', '75', '77', '78', '82', '83', '84', '85', '86', '88', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99', '104', '105', '106', '112', '113', '114', '115', '116', '117', '118', '119', '120', '121', '122', '123', '124', '125', '126', '127', '128', '129', '130', '131', '132', '133', '134', '135', '136', '137', '138', '139', '140', '141', '142', '143', '144', '145', '146', '147', '148', '149', '150', '151', '152', '153', '154', '155', '156', '157', '158', '159']
 # CLASSES = ['122' , '126' , '104']
-CLASSES = ['5' , '127' , '147']
+CLASSES = ['122']
 
 class ShapesConfig(Config):
     """Configuration for training on the toy shapes dataset.
@@ -106,7 +106,7 @@ class DrugDataset(utils.Dataset):
 
     # 重新写load_shapes，里面包含自己的自己的类别
     # 并在self.image_info信息中添加了path、mask_path 、yaml_path
-    # yaml_pathdataset_root_path = "/tongue_dateset/"
+    # yaml_pathdataset_root_path = "/tongue_dateset/"cd
     # img_floder = dataset_root_path + "rgb"
     # mask_floder = dataset_root_path + "mask"
     # dataset_root_path = "/tongue_dateset/"
@@ -144,6 +144,7 @@ class DrugDataset(utils.Dataset):
         count = 1  # number of object
         img = Image.open(info['mask_path'])
         
+        
         num_obj = self.get_obj_index(img)
         # print('num_obj:' , num_obj)
         
@@ -179,7 +180,7 @@ def get_ax(rows=1, cols=1, size=8):
     return ax
 
 #基础设置
-dataset_root_path="/home/han/Mask_RCNN/Train/"
+dataset_root_path="/home/han/Mask_RCNN/Train2/"
 img_floder = dataset_root_path + "pic"
 mask_floder = dataset_root_path + "cv2_mask"
 #yaml_floder = dataset_root_path
